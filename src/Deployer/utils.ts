@@ -3,7 +3,7 @@
 import { SubmittableResult } from '@polkadot/api';
 import { Abi } from '@polkadot/api-contract';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { TypeRegistry } from '@polkadot/types';
+//import { TypeRegistry } from '@polkadot/types';
 import { existsSync, readFileSync } from 'fs';
 
 export const GetByteArray = (filePath: string) => {
@@ -77,12 +77,15 @@ export const GetAbiData = (
 ) => {
   const metadata = require(path);
   const selector = getAbiObj(metadata);
-  const data = selector.constructors[constructorIndex](arg);
+  console.log(selector.constructors[constructorIndex]);
+  console.log(arg);
+  //TODO: fix this
+  const data = selector.constructors[constructorIndex];
   return data;
 };
 
 export const getAbiObj = obj => {
-  const registry = new TypeRegistry();
-  const contractAbi = new Abi(registry, obj);
+  //const registry = new TypeRegistry();
+  const contractAbi = new Abi(obj);
   return contractAbi;
 };

@@ -55,9 +55,10 @@
   },
   "dependencies": {
     "@halva-suite/halva-spec-builder": "^1.1.0",
-    "@polkadot/api": "^2.1.1",
-    "@polkadot/api-contract": "^2.1.1",
-    "@polkadot/keyring": "^3.5.1",
+    "@polkadot/api": "^3.11.1",
+    "@polkadot/api-contract": "^3.11.1",
+    "@polkadot/keyring": "^5.9.2",
+    "@polkadot/metadata": "^3.11.1",
     "@polkadot/util": "^3.5.1",
     "@polkadot/util-crypto": "^3.5.1",
     "assertion-error": "^1.1.0",

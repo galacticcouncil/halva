@@ -1,6 +1,6 @@
 import { SubmittableResult } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { ContractExecResultSuccess } from '@polkadot/types/interfaces/contracts/types';
+import { ContractExecResultOk } from '@polkadot/types/interfaces/contracts/types';
 import { stringCamelCase } from '@polkadot/util';
 import { readFileSync } from 'fs';
 import { basename, extname } from 'path';
@@ -70,20 +70,21 @@ export class artifacts {
     ContractData.abi = getAbiObj(JSON.parse(ContractData.abiJSON));
     // @ts-ignore currently unused local ignore
     for (const [key, value] of Object.entries(
-      ContractData.abi.abi.contract.messages
+      //ContractData.abi.abi.contract.messages
+      ContractData.abi.messages
     )) {
-      ContractPrimitive.prototype[value.name] = async function(
+      ContractPrimitive.prototype[value.identifier] = async function(
         signer: KeyringPair,
         args: any
       ): Promise<CallContractResult> {
         const txResult = await artifacts.ReturnTxResult(
-          value.name,
+          value.identifier,
           signer,
           ContractData,
           args
         );
         const rpcResult = await artifacts.ReturnRPCResult(
-          value.name,
+          value.identifier,
           signer,
           ContractData,
           args
@@ -116,5 +117,5 @@ export class ContractPrimitive {
 
 export interface CallContractResult {
   txResult: SubmittableResult;
-  rpcResult: ContractExecResultSuccess;
+  rpcResult: ContractExecResultOk;
 }

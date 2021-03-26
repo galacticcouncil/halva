@@ -1,10 +1,10 @@
 // tslint:disable: no-implicit-dependencies
 // tslint:disable: no-submodule-imports
 import { ApiPromise, SubmittableResult, WsProvider } from '@polkadot/api';
-import testKeyring from '@polkadot/keyring/testing';
+import { createTestKeyring } from '@polkadot/keyring/testing';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Address } from '@polkadot/types/interfaces';
-import { ContractExecResultSuccess } from '@polkadot/types/interfaces/contracts';
+import { ContractExecResultOk } from '@polkadot/types/interfaces/contracts';
 import BN from 'bn.js';
 import { readFileSync } from 'fs';
 import { HalvaTestConfig } from '../TestRunner';
@@ -47,13 +47,15 @@ export const instantiate = async (
   codeHash: string,
   inputData: any,
   endowment: BN,
-  gasRequired: number = GAS_REQUIRED
+  gasRequired: number = GAS_REQUIRED,
+  salt: string
 ): Promise<Address> => {
   const tx = api.tx.contracts.instantiate(
     endowment,
     gasRequired,
     codeHash,
-    inputData
+    inputData,
+    salt
   );
   const result: any = await sendAndReturnFinalized(signer, tx);
   const record = result.findRecord('contracts', 'Instantiated');
@@ -95,7 +97,7 @@ export async function callContractRPC(
   inputData: any,
   gasRequired: number = GAS_REQUIRED,
   endowment: number = 0
-): Promise<ContractExecResultSuccess> {
+): Promise<ContractExecResultOk> {
   signer = signer;
   const rpc = await api.rpc.contracts.call({
     origin: signer.address,
@@ -105,10 +107,10 @@ export async function callContractRPC(
     inputData
   });
 
-  if (rpc.isError) {
+  if (rpc.result.isErr) {
     throw new Error('RPC cal is error');
   }
-  return rpc.asSuccess;
+  return rpc.result.asOk;
 }
 
 export const deployContract = async (
@@ -120,16 +122,20 @@ export const deployContract = async (
 ): Promise<Contract> => {
   const provider = new WsProvider(config.halvaJs.ws);
   const polkadot = await ApiPromise.create({ provider, types: config.types });
-  const keyring = testKeyring({ type: 'sr25519' });
+  const keyring = createTestKeyring({ type: 'sr25519' });
   const alicePair = keyring.getPair(ALICE);
   const hash = await UploadContract(contract, polkadot, alicePair);
+  //TODO: fix this 
+  const salt = 'not-valid-salt';
   console.log('\x1b[33m%s\x1b[0m', 'WASM code hash ' + hash);
   const address = await instantiate(
     polkadot,
     alicePair,
     hash,
     GetAbiData(abi, constructorIndex, args),
-    CREATION_FEE
+    CREATION_FEE,
+    0,
+    salt
   );
   console.log('\x1b[33m%s\x1b[0m', `Contract address: ${address}`);
   return {

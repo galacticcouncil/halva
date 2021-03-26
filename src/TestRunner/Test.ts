@@ -1,6 +1,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { Metadata } from '@polkadot/types';
+import { Metadata } from '@polkadot/metadata';
 import { expect, assert } from 'chai';
 import Mocha from 'mocha';
 import path from 'path';
@@ -13,7 +13,7 @@ import {
 } from '../Assert/Asserts';
 import { artifacts } from '../Migrator/Artifacts';
 import { HalvaTestConfig } from './Config/HalvaTestConfig';
-import testKeyring from '@polkadot/keyring/testing';
+import { createTestKeyring } from '@polkadot/keyring/testing';
 import { ALICE, CHARLIE, BOB } from '../Deployer/consts';
 // tslint:disable: variable-name
 declare global {
@@ -43,7 +43,7 @@ export const HalvaRunTests = async (
   const provider = new WsProvider(config.halvaJs.ws);
   const polkadot = await ApiPromise.create({ provider, types: config.types });
   const accounts = await generateAccounts(10, config.halvaJs.mnemonic);
-  const keyring = testKeyring({ type: 'sr25519' });
+  const keyring = createTestKeyring();
   const alicePair = keyring.getPair(ALICE);
   const charliePair = keyring.getPair(CHARLIE);
   
